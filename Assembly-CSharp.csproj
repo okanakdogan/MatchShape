@@ -47,6 +47,8 @@
   <ItemGroup>
      <Compile Include="Assets\HomeShapeController.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
+     <Compile Include="Assets\Scripts\ShapeMatchChecker.cs" />
+     <Compile Include="Assets\Scripts\SwipeManager.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameController : MonoBehaviour {
@@ -6,11 +7,18 @@ public class GameController : MonoBehaviour {
 	public bool readyForStart;
 
 	public GameObject[] shapePrefabs;
+	public Color[] colors;
 	private Transform homeShapeSpawn;
 	private float fallSpeed;
 	public int state;
 	private GameObject targetShape;
 	private Transform targetShapeSpawn;
+	public GameObject homeShape;
+	private ShapeMatchChecker smc;
+	private int lastColorInd;
+
+	private int score;
+	private float timeLeft;
 	/*
 	 * states:
 	 * 
@@ -28,43 +36,63 @@ public class GameController : MonoBehaviour {
 		state = 0;
 		homeShapeSpawn = GameObject.Find ("PlayerShapeSpawn").transform;
 		targetShapeSpawn = GameObject.Find ("ShapeSpawn").transform;
-		fallSpeed = 1f;
+		fallSpeed = .5f;
 		//start game
-
-		readyForStart = false;
+		homeShape = null;
+		smc = new ShapeMatchChecker() ;
+		colors = new Color[]{Color.black,Color.blue,Color.cyan,
+		Color.green,Color.red,Color.yellow};
+		lastColorInd = 0;
+		score = 0;
+		timeLeft = 2f;
+		readyForStart = true;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		//**Game Loop
 
-		if (state == 0) {
-			//Create Shape
-			targetShape=createShape();
+		//time update
+		if (readyForStart) {
 
-			//Rotate random
+			//timeLeft -= Time.deltaTime;
+			GameObject.Find ("Canvas/TimeText").GetComponent<Text> ().text = "T:" + Mathf.Round (timeLeft).ToString ();
+			if(timeLeft<=0){
+				readyForStart=false;
+				//game over
+				//show score bigger
+			}
 
-			state=1;
+			if (state == 0) {
+				//Create Shape
+				targetShape = createShape ();
 
-		} else if (state == 1) {
-			//send down
-			Debug.Log("SendDown");
-			if( sendShapeDown(targetShape))
-				state=2;
-		}else if(state==2){
-			//check match cond.
-				//temp delete for now
-			Destroy(targetShape);
-			//result
 
-			//clean screen
+				//Rotate random
+				changeShapeStat (targetShape);
+				state = 1;
 
-			state++;
+			} else if (state == 1) {
+				//send down
+				if (sendShapeDown (targetShape))
+					state = 2;
+			} else if (state == 2) {
+				//check match cond.
+
+				bool res = smc.checkShapeMatch (targetShape, homeShape);
+				//Destroy(targetShape);
+				Destroy (targetShape);
+				//result
+				result (res);
+				//clean screen
+
+				state++;
+			}
+			//change state
+			if (state > 2)
+				state = 0;
+			//go back
 		}
-		//change state
-		if(state>2)
-			state = 0;
-		//go back
 	}
 
 	private GameObject createShape(){
@@ -76,13 +104,18 @@ public class GameController : MonoBehaviour {
 		return targetShape;
 	}
 
-	private GameObject changeShapeStat(GameObject shape){
-
+	private void changeShapeStat(GameObject shape){
+		int angle = Random.Range (-30, 30);
+		//Debug.Log ("RandomAngle: " + angle);
 		//rotate
-
+		//shape.transform.Rotate (new Vector3(0f,0f,(float)angle));
 		//Maybe more transforms
+		//change color
+		int colorInd = 0;
+		while( (colorInd=Random.Range (0,colors.Length))==lastColorInd);
+		lastColorInd = colorInd;
+		shape.GetComponent<SpriteRenderer> ().color = colors [colorInd];
 
-		return null;
 	}
 
 	private bool sendShapeDown(GameObject shape){
@@ -91,6 +124,7 @@ public class GameController : MonoBehaviour {
 			shape.transform.position = Vector3.Lerp (shape.transform.position,homeShapeSpawn.transform.position,
 			                                         Time.deltaTime*fallSpeed);
 		// check collider
+		//homeCollider.bounds.Intersects (shape);
 		// temp location check
 
 		if (Vector3.Distance (shape.transform.position, homeShapeSpawn.position) < 1)
@@ -99,18 +133,48 @@ public class GameController : MonoBehaviour {
 		//maybe for many objects
 		return false;
 	}
-
+	/*
 	private bool checkMatchCond(GameObject targetShape, GameObject myShape){
 		// check their stats and make judgement
 
-		return false;
-	}
+		//check shapeType
+		//call shapeChecker script let them match
+		if (targetShape.GetComponent<SpriteRenderer> ().sprite.name.Equals (
+			myShape.GetComponent<SpriteRenderer> ().sprite.name)==false) {
+			Debug.Log("MatchCond: False");
+			return false;
+		}
 
-	private void result(){
+		Debug.Log("MatchCond: True");
+		return true;
+	}*/
+
+	private void result(bool matchResult){
 		// give points or punish
-
+		Debug.Log ("Match result: " + matchResult);
+		if (matchResult == true) {
+			score+=10;
+			//update score
+			GameObject.Find("Canvas/ScoreText").GetComponent<Text>().text=score.ToString();
+		}
 		// destroy objects
 	}
-
+	/*
+	private int getPeriodAngle(string shapeName){
+		int periodAngle = 60f;
+		
+		if (shapeName.Equals ("triangle")) {
+			periodAngle=60f;
+		} else if (shapeName.Equals ("square")) {
+			periodAngle=90f;
+		}
+		else if (shapeName.Equals ("rectangle")) {
+			periodAngle=90f;
+			
+		}else if (shapeName.Equals ("star")) {
+			periodAngle=90f;
+		}
+		return periodAngle;
+	}*/
 
 }
