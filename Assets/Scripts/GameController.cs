@@ -33,6 +33,7 @@ public class GameController : MonoBehaviour {
 	void Start () {
 	
 		//init 
+		Screen.orientation = ScreenOrientation.Portrait;
 		state = 0;
 		homeShapeSpawn = GameObject.Find ("PlayerShapeSpawn").transform;
 		targetShapeSpawn = GameObject.Find ("ShapeSpawn").transform;
@@ -44,7 +45,7 @@ public class GameController : MonoBehaviour {
 		Color.green,Color.red,Color.yellow};
 		lastColorInd = 0;
 		score = 0;
-		timeLeft = 2f;
+		timeLeft = 60f;
 		readyForStart = true;
 	}
 	
@@ -80,6 +81,7 @@ public class GameController : MonoBehaviour {
 				//check match cond.
 
 				bool res = smc.checkShapeMatch (targetShape, homeShape);
+
 				//Destroy(targetShape);
 				Destroy (targetShape);
 				//result

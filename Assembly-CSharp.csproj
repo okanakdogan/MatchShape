@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\HomeShapeController.cs" />
+     <Compile Include="Assets\MainMenuPanelHelper.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\ShapeMatchChecker.cs" />
      <Compile Include="Assets\Scripts\SwipeManager.cs" />

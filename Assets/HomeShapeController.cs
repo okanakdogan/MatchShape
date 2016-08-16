@@ -16,7 +16,7 @@ public class HomeShapeController : MonoBehaviour {
 
 	private float M_SMALL=0.3f;
 	private float M_BIG = 3f;
-	private float moveSpeed=1f;
+	private float moveSpeed=0.01f;
 
 	//private SwipeManager swipeMngr;
 	//For swipe
@@ -108,11 +108,11 @@ public class HomeShapeController : MonoBehaviour {
 			//kill left
 			Destroy(leftShape);
 			leftShape= homeShape;
-			leftShape.transform.position = homeShapeSpawn.transform.position + new Vector3(-2,0,0);
+			//leftShape.transform.position = homeShapeSpawn.transform.position + new Vector3(-2,0,0);
 			scaleShape(leftShape,M_SMALL);
 
 			homeShape=rightShape;
-			homeShape.transform.position= homeShapeSpawn.transform.position;
+			//homeShape.transform.position= homeShapeSpawn.transform.position;
 			scaleShape(homeShape,M_BIG);
 
 			nextShapeIndex();
@@ -128,11 +128,11 @@ public class HomeShapeController : MonoBehaviour {
 			//kill right
 			Destroy(rightShape);
 			rightShape=homeShape;
-			rightShape.transform.position = homeShapeSpawn.transform.position + new Vector3(2,0,0);
+			//rightShape.transform.position = homeShapeSpawn.transform.position + new Vector3(2,0,0);
 			scaleShape(rightShape,M_SMALL);
 
 			homeShape=leftShape;
-			homeShape.transform.position=homeShapeSpawn.transform.position;
+			//homeShape.transform.position=homeShapeSpawn.transform.position;
 			scaleShape(homeShape,M_BIG);
 
 			prevShapeIndex();
@@ -153,6 +153,9 @@ public class HomeShapeController : MonoBehaviour {
 	}
 	private void inputHandle(){
 
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+			Application.Quit(); 
+
 		//tap
 
 		if (SwipeManager.IsTapped ()) {
@@ -162,13 +165,9 @@ public class HomeShapeController : MonoBehaviour {
 			//rotate left
 			if(homeShape!=null){
 				//homeShape.transform.Rotate(new Vector3(0,0,22.5f));
-				/*
-				--colorIndex;
-				if(colorIndex<0)
-					colorIndex=colors.Length-1;
-				homeShape.GetComponent<SpriteRenderer>().color= colors[colorIndex];*/
+
 				swipeShape(-1);
-				//StartCoroutine("MoveShapesLeft");
+				StartCoroutine("MoveShapesLeft");
 			}
 
 		}
@@ -176,10 +175,9 @@ public class HomeShapeController : MonoBehaviour {
 			//rotate right
 			if(homeShape!=null){
 				//homeShape.transform.Rotate(new Vector3(0,0,-22.5f));
-				/*colorIndex= (colorIndex+1)% colors.Length;
-				homeShape.GetComponent<SpriteRenderer>().color= colors[colorIndex];*/
+
 				swipeShape(1);
-				//StartCoroutine("MoveShapesRight");
+				StartCoroutine("MoveShapesRight");
 
 			}
 		}
@@ -233,24 +231,27 @@ public class HomeShapeController : MonoBehaviour {
 	//coroutine for swipe shape
 
 	IEnumerator MoveShapesLeft() {
-		leftShape.transform.position = Vector3.Lerp (leftShape.transform.position,
-		                                             homeShapeSpawn.transform.position+new Vector3(-2,0,0),
-		                                             Time.deltaTime*moveSpeed);
 
-		homeShape.transform.position = Vector3.Lerp (homeShape.transform.position,
+		while ((homeShape.transform.position - homeShapeSpawn.transform.position).magnitude >0.01f) {
+			leftShape.transform.position = Vector3.Lerp (leftShape.transform.position,
+		                                             homeShapeSpawn.transform.position + new Vector3 (-2, 0, 0),
+		                                             Time.deltaTime * moveSpeed);
+
+			homeShape.transform.position = Vector3.Lerp (homeShape.transform.position,
 		                                            homeShapeSpawn.transform.position, Time.deltaTime * moveSpeed);
-
+		}
 		yield return null;
 	}
 
 	IEnumerator MoveShapesRight() {
-		rightShape.transform.position = Vector3.Lerp (rightShape.transform.position,
-		                                             homeShapeSpawn.transform.position+new Vector3(2,0,0),
-		                                             Time.deltaTime*moveSpeed);
-		
-		homeShape.transform.position = Vector3.Lerp (homeShape.transform.position,
-		                                             homeShapeSpawn.transform.position, Time.deltaTime * moveSpeed);
-		
+		while ((homeShape.transform.position - homeShapeSpawn.transform.position).magnitude >0.01f) {
+			rightShape.transform.position = Vector3.Lerp (rightShape.transform.position,
+			                                             homeShapeSpawn.transform.position+new Vector3(2,0,0),
+			                                             Time.deltaTime*moveSpeed);
+			
+			homeShape.transform.position = Vector3.Lerp (homeShape.transform.position,
+			                                             homeShapeSpawn.transform.position, Time.deltaTime * moveSpeed);
+		}
 		yield return null;
 	}
 }
