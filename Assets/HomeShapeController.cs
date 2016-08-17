@@ -13,6 +13,8 @@ public class HomeShapeController : MonoBehaviour {
 	private int shapeIndex;
 	private int colorIndex;
 	private Transform homeShapeSpawn;
+	private GameObject colorUp;
+	private GameObject colorDown;
 
 	private float M_SMALL=0.3f;
 	private float M_BIG = 3f;
@@ -34,7 +36,8 @@ public class HomeShapeController : MonoBehaviour {
 		shapeIndex = 0;
 		colorIndex = 0;
 		homeShapeSpawn = GameObject.Find ("PlayerShapeSpawn").transform;
-		//swipeMngr = GameObject.Find ("SwipeControl").GetComponent<SwipeManager> ();
+		createColorButtons ();
+		 
 	}
 	
 	// Update is called once per frame
@@ -55,7 +58,23 @@ public class HomeShapeController : MonoBehaviour {
 
 		}
 	}
+	private void createColorButtons(){
 
+		float scale = 4f;
+		colorUp = (GameObject)Instantiate (shapes [3], homeShapeSpawn.position+new Vector3(0,0.95f,0),
+		                                   homeShapeSpawn.rotation);
+		colorUp.transform.localScale=new Vector3 (colorUp.transform.localScale.x/scale,
+		                                          colorUp.transform.localScale.y/scale,
+		                                          colorUp.transform.localScale.z);
+
+		colorDown = (GameObject)Instantiate (shapes [3], homeShapeSpawn.position+new Vector3(0,-0.95f,0),
+		                                               homeShapeSpawn.rotation);
+		colorDown.transform.Rotate (new Vector3 (0, 0, 180));
+		colorDown.transform.localScale=new Vector3 (colorDown.transform.localScale.x/scale,
+		                                            colorDown.transform.localScale.y/scale,
+		                                            colorDown.transform.localScale.z);
+		changeColorButtonsColor ();
+	}
 	private GameObject createHomeShape(){
 
 		//select a shape and create
@@ -226,6 +245,17 @@ public class HomeShapeController : MonoBehaviour {
 		homeShape.GetComponent<SpriteRenderer> ().color = colors [colorInd];
 		leftShape.GetComponent<SpriteRenderer> ().color = colors [colorInd];
 		rightShape.GetComponent<SpriteRenderer> ().color = colors [colorInd];
+		changeColorButtonsColor ();
+	}
+
+	private void changeColorButtonsColor(){
+		int cIndex = ((colorIndex+1)<colors.Length) ?colorIndex+1:0;
+
+		colorDown.GetComponent<SpriteRenderer> ().color = colors [cIndex];
+
+		cIndex= ((colorIndex-1)<0) ? colors.Length-1:colorIndex-1 ; 
+		colorUp.GetComponent<SpriteRenderer> ().color = colors [cIndex];
+	
 	}
 
 	//coroutine for swipe shape
@@ -260,6 +290,8 @@ public class HomeShapeController : MonoBehaviour {
 		homeShape.SetActive (false);
 		rightShape.SetActive (false);
 		leftShape.SetActive (false);
+		colorUp.SetActive (false);
+		colorDown.SetActive (false);
 	}
 }
 
