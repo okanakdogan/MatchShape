@@ -254,6 +254,13 @@ public class HomeShapeController : MonoBehaviour {
 		}
 		yield return null;
 	}
+
+	public void hideOnGameOver(){
+
+		homeShape.SetActive (false);
+		rightShape.SetActive (false);
+		leftShape.SetActive (false);
+	}
 }
 
 

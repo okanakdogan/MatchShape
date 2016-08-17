@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour {
 	private ShapeMatchChecker smc;
 	private int lastColorInd;
 
+	private GameObject endScreenImage;
 	private int score;
 	private float timeLeft;
 	/*
@@ -46,6 +47,9 @@ public class GameController : MonoBehaviour {
 		lastColorInd = 0;
 		score = 0;
 		timeLeft = 60f;
+		showHighScore ();
+		endScreenImage = GameObject.Find ("Canvas/EndGameImage");
+		endScreenImage.SetActive (false);
 		readyForStart = true;
 	}
 	
@@ -56,12 +60,16 @@ public class GameController : MonoBehaviour {
 		//time update
 		if (readyForStart) {
 
-			//timeLeft -= Time.deltaTime;
+			timeLeft -= Time.deltaTime;
 			GameObject.Find ("Canvas/TimeText").GetComponent<Text> ().text = "T:" + Mathf.Round (timeLeft).ToString ();
-			if(timeLeft<=0){
-				readyForStart=false;
+
+			if (timeLeft <= 0) {
+				readyForStart = false;
 				//game over
 				//show score bigger
+
+				//
+
 			}
 
 			if (state == 0) {
@@ -94,6 +102,12 @@ public class GameController : MonoBehaviour {
 			if (state > 2)
 				state = 0;
 			//go back
+		} else {
+			//endScreenImage.SetActive(true);
+			// wait
+			StartCoroutine ("wait");
+			
+
 		}
 	}
 
@@ -102,6 +116,7 @@ public class GameController : MonoBehaviour {
 		int shapeIndex = Random.Range(0,shapePrefabs.Length);
 		//spawn it
 		targetShape = (GameObject)Instantiate (shapePrefabs [shapeIndex], targetShapeSpawn.position, targetShapeSpawn.rotation);
+
 		//return it
 		return targetShape;
 	}
@@ -158,9 +173,35 @@ public class GameController : MonoBehaviour {
 			score+=10;
 			//update score
 			GameObject.Find("Canvas/ScoreText").GetComponent<Text>().text=score.ToString();
+			StoreHighscore(score);
 		}
 		// destroy objects
 	}
+	void StoreHighscore(int newHighscore)
+	{
+		int oldHighscore = PlayerPrefs.GetInt("highscore", 0);    
+		if(newHighscore > oldHighscore)
+			PlayerPrefs.SetInt("highscore", newHighscore);
+	}
+
+	void showHighScore(){
+		int oldHighscore = PlayerPrefs.GetInt("highscore", 0); 
+		GameObject.Find ("Canvas/HighScoreText").GetComponent<Text> ().text = oldHighscore.ToString();
+	}
+
+
+	IEnumerator wait() {
+		//deactive other objects
+
+		targetShape.SetActive (false);
+		homeShapeSpawn.GetComponent<HomeShapeController> ().hideOnGameOver ();
+		endScreenImage.SetActive (true);
+		GameObject.Find("Canvas/EndGameImage/EndScoreValueText").GetComponent<Text>().text = score.ToString();
+		yield return new WaitForSeconds(3);
+		endScreenImage.SetActive (false);
+		Application.LoadLevel ("gameScene");
+	}
+
 	/*
 	private int getPeriodAngle(string shapeName){
 		int periodAngle = 60f;
